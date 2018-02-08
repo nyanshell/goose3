@@ -206,7 +206,7 @@ class Crawler(object):
 
     @staticmethod
     def get_parse_candidate(crawl_candidate):
-        if crawl_candidate.raw_html:
+        if crawl_candidate.raw_html is not None:
             return RawHelper.get_parsing_candidate(crawl_candidate.url, crawl_candidate.raw_html)
         return URLHelper.get_parsing_candidate(crawl_candidate.url)
 
@@ -218,7 +218,7 @@ class Crawler(object):
     def get_html(self, crawl_candidate, parsing_candidate):
         # we got a raw_tml
         # no need to fetch remote content
-        if crawl_candidate.raw_html:
+        if crawl_candidate.raw_html is not None:
             return crawl_candidate.raw_html
 
         # fetch HTML

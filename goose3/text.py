@@ -24,6 +24,8 @@ import os
 import re
 import string
 
+import cchardet
+
 from goose3.utils import FileHelper
 from goose3.utils.encoding import (smart_unicode, smart_str, DjangoUnicodeDecodeError)
 
@@ -40,24 +42,9 @@ def get_encodings_from_content(content):
     :param content: string to extract encodings from.
     """
     if isinstance(content, bytes):
-        find_charset = re.compile(
-            br'<meta.*?charset=["\']*([a-z0-9\-_]+?) *?["\'>]', flags=re.I
-        ).findall
-
-        find_xml = re.compile(
-            br'^<\?xml.*?encoding=["\']*([a-z0-9\-_]+?) *?["\'>]'
-        ).findall
-        return [encoding.decode('utf-8') for encoding in
-                find_charset(content) + find_xml(content)]
+        return cchardet.detect(content)['encoding']
     else:
-        find_charset = re.compile(
-            r'<meta.*?charset=["\']*([a-z0-9\-_]+?) *?["\'>]', flags=re.I
-        ).findall
-
-        find_xml = re.compile(
-            r'^<\?xml.*?encoding=["\']*([a-z0-9\-_]+?) *?["\'>]'
-        ).findall
-        return find_charset(content) + find_xml(content)
+        return cchardet.detect(content.encode('raw_unicode_escape'))['encoding']
 
 
 def innerTrim(value):

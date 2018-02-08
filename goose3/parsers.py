@@ -25,7 +25,7 @@ from copy import deepcopy
 import lxml.html
 from lxml import etree
 
-from goose3.text import innerTrim, encodeValue, get_encodings_from_content, smart_str
+from goose3.text import innerTrim, get_encodings_from_content
 
 
 class Parser(object):
@@ -51,14 +51,12 @@ class Parser(object):
     @classmethod
     def fromstring(cls, html):
         encoding = get_encodings_from_content(html)
-        encoding = encoding and encoding[0] or None
-        if not encoding:
-            html = encodeValue(html)
-            doc = lxml.html.fromstring(html)
+        if isinstance(html, bytes):
+            html = html.decode(encoding, errors='ignore')
         else:
-            html = smart_str(html, encoding=encoding)
-            parser = lxml.html.HTMLParser(encoding=encoding)
-            doc = lxml.html.fromstring(html, parser=parser)
+            html = html.encode('raw_unicode_escape').decode(encoding, errors='ignore')
+        parser = lxml.html.HTMLParser(encoding=encoding)
+        doc = lxml.html.fromstring(html, parser=parser)
         return doc
 
     @classmethod
@@ -247,6 +245,11 @@ class ParserSoup(Parser):
     @classmethod
     def fromstring(cls, html):
         from lxml.html import soupparser
-        html = encodeValue(html)
+        if isinstance(html, bytes):
+            encoding = get_encodings_from_content(html)
+            if encoding:
+                html = html.decode(encoding, errors='ignore')
+            else:
+                html = html.encode('raw_unicode_escape').decode(encoding, errors='ignore')
         doc = soupparser.fromstring(html)
         return doc
