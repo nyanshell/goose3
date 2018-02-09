@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import unicode_literals
+import lxml.html
 
 from goose3.utils import ReplaceSequence
 
@@ -164,8 +164,8 @@ class DocumentCleaner(object):
             self.parser.drop_tag(item)
         return doc
 
-    def get_flushed_buffer(self, replacement_text, doc):
-        return self.parser.textToPara(replacement_text)
+    def get_flushed_buffer(self, replacement_text):
+        return lxml.html.fromstring(replacement_text)
 
     def get_replacement_nodes(self, doc, div):
         replacement_text = []
@@ -177,7 +177,7 @@ class DocumentCleaner(object):
             # node is a p
             # and already have some replacement text
             if self.parser.getTag(kid) == 'p' and len(replacement_text) > 0:
-                new_node = self.get_flushed_buffer(''.join(replacement_text), doc)
+                new_node = self.get_flushed_buffer(''.join(replacement_text))
                 nodes_to_return.append(new_node)
                 replacement_text = []
                 nodes_to_return.append(kid)
@@ -219,7 +219,7 @@ class DocumentCleaner(object):
 
         # flush out anything still remaining
         if len(replacement_text) > 0:
-            new_node = self.get_flushed_buffer(''.join(replacement_text), doc)
+            new_node = self.get_flushed_buffer(''.join(replacement_text))
             nodes_to_return.append(new_node)
             replacement_text = []
 

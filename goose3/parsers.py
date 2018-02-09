@@ -125,10 +125,6 @@ class Parser(object):
         return list(root)
 
     @classmethod
-    def textToPara(cls, text):
-        return cls.fromstring(text)
-
-    @classmethod
     def getChildren(cls, node):
         return node.getchildren()
 
