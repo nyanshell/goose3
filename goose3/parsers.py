@@ -55,8 +55,7 @@ class Parser(object):
             html = html.decode(encoding, errors='ignore')
         else:
             html = html.encode('raw_unicode_escape').decode(encoding, errors='ignore')
-        parser = lxml.html.HTMLParser(encoding=encoding)
-        doc = lxml.html.fromstring(html, parser=parser)
+        doc = lxml.html.fromstring(html)
         return doc
 
     @classmethod
